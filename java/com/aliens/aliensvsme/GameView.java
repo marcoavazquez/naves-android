@@ -12,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.Random;
+
 import static java.lang.Thread.sleep;
 
 
@@ -20,12 +22,14 @@ public class GameView extends SurfaceView {
     private Bitmap bmp_nave;
     private Bitmap fondo;
     private Bitmap bmp_badnave1;
+    private Bitmap bmp_bad_navecita;
 
     private SurfaceHolder holder;
     private GameLoopThread gameLoopThread;
 
     private Nave nave;
     private BadNave badnave;
+    private BadNavecita badNavecita[];
     private Bala bala;
 
     public boolean touched;
@@ -34,6 +38,8 @@ public class GameView extends SurfaceView {
 
     public int x;
     public int y;
+
+    Random rnd;
 
     public GameView(Context context){
         super(context);
@@ -71,11 +77,11 @@ public class GameView extends SurfaceView {
             }
         });
 
-        bmp_nave  = BitmapFactory.decodeResource(getResources(), R.drawable.nave1);
-        bmp_badnave1  = BitmapFactory.decodeResource(getResources(), R.drawable.badnave1);
+        bmp_nave     = BitmapFactory.decodeResource(getResources(), R.drawable.nave1);
+        bmp_bad_navecita = BitmapFactory.decodeResource(getResources(), R.drawable.badnavecita);
+        bmp_badnave1 = BitmapFactory.decodeResource(getResources(), R.drawable.badnave1);
 
-        fondo     = BitmapFactory.decodeResource(getResources(), R.drawable.fondo);
-        //boton     = BitmapFactory.decodeResource(getResources(), R.drawable.boton);
+        fondo        = BitmapFactory.decodeResource(getResources(), R.drawable.fondo);
 
 
       }
@@ -85,6 +91,13 @@ public class GameView extends SurfaceView {
         nave = new Nave(this, bmp_nave);
         bala = new Bala(this);
         badnave = new BadNave(this, bmp_badnave1);
+
+        badNavecita = new BadNavecita[10];
+        rnd = new Random();
+        for (int i = 0; i < 10 ; i++) {
+            badNavecita[i] = new BadNavecita(this, bmp_bad_navecita, rnd.nextInt(this.getWidth()) + 200, rnd.nextInt(this.getHeight()));
+        }
+
     }
 
     @Override
@@ -107,6 +120,11 @@ public class GameView extends SurfaceView {
             bala.levantado = true;
 
         }
+
+        for (int i = 0; i < 10 ; i++) {
+            badNavecita[i].onDraw(canvas);
+        }
+
 
 
 
