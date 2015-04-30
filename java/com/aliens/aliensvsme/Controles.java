@@ -17,10 +17,10 @@ public class Controles {
     public int posArmaAlto;
     public int bmpH;
     public int bmpW;
+    public boolean disparado;
 
-    public int posBalaX = 310;
-    public int posBalaY = 210;
-    public int trayBala;
+    public int posBalaX = -5;
+    public int posBalaY = -5;
 
     public Controles(GameView gameview, Bitmap bitmap){
         this.gameView = gameview;
@@ -38,26 +38,24 @@ public class Controles {
 
     public void onDraw(Canvas canvas){
 
-        Paint bala = new Paint();
-        bala.setColor(Color.WHITE);
-        bala.setStyle(Paint.Style.FILL);
-        canvas.drawBitmap(boton, posArmaAncho, posArmaAlto , null);
-        canvas.drawCircle(posBalaX, posBalaY, 10, bala);
+        //canvas.drawBitmap(boton, posArmaAncho, posArmaAlto , null);
+
     }
 
-    public void disparar(int naveX, int naveW, int naveY, int naveH){
-        if(gameView.touched &&
-                gameView.touched_x > posArmaAncho &&
-                gameView.touched_x < posArmaAncho + bmpW &&
-                gameView.touched_y > posArmaAlto &&
-                gameView.touched_y < posArmaAlto + bmpH ){
+    //public void disparar(int naveX, int naveW, int naveY, int naveH){
+    public boolean disparar(){
 
-            // Si ha tocado el boton de arma retorna Verdadero
+        if(gameView.touched && (gameView.indice == 0 || gameView.indice == 1) &&
+                    gameView.x > posArmaAncho && gameView.x < posArmaAncho + bmpW &&
+                    gameView.y > posArmaAlto  && gameView.y < posArmaAlto + bmpH ) {
 
-            posBalaX = naveX + naveW;
-            posBalaY = naveY + naveH / 2;
-
-            trayBala = posBalaX + 1;
+            //posBalaX = naveX + naveW;
+            //posBalaY = naveY + naveH / 2;
+            return true;
         }
+        return false;
     }
+
+
+
 }

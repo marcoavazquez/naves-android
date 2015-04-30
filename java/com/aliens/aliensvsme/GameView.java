@@ -4,37 +4,36 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import static java.lang.Thread.sleep;
+
 
 public class GameView extends SurfaceView {
 
-    // Maximos touch al mismo tiempo, 2, uno para nave otro para balas
-    final int MAX_POINT_CNT = 2;
-
-    float[] x = new float[MAX_POINT_CNT];
-    float[] y = new float[MAX_POINT_CNT];
-    boolean[] isTouch = new boolean[MAX_POINT_CNT];
-
-    float[] x_last = new float[MAX_POINT_CNT];
-    float[] y_last = new float[MAX_POINT_CNT];
-    boolean[] isTouch_last = new boolean[MAX_POINT_CNT];
-
-    private final Bitmap boton;
-    private final Bitmap badnave1;
     private Bitmap bmp_nave;
     private Bitmap fondo;
+    private Bitmap bmp_badnave1;
+
     private SurfaceHolder holder;
     private GameLoopThread gameLoopThread;
 
-    private Controles controles;
     private Nave nave;
+    private BadNave badnave;
+    private Bala bala;
 
     public boolean touched;
-    public int touched_x, touched_y;
+    public boolean multi;
+    public int indice;
+
+    public int x;
+    public int y;
 
     public GameView(Context context){
         super(context);
@@ -73,103 +72,134 @@ public class GameView extends SurfaceView {
         });
 
         bmp_nave  = BitmapFactory.decodeResource(getResources(), R.drawable.nave1);
-        badnave1 = BitmapFactory.decodeResource(getResources(), R.drawable.badnave1);
+        bmp_badnave1  = BitmapFactory.decodeResource(getResources(), R.drawable.badnave1);
 
-        fondo = BitmapFactory.decodeResource(getResources(), R.drawable.fondo);
-        boton = BitmapFactory.decodeResource(getResources(), R.drawable.boton);
+        fondo     = BitmapFactory.decodeResource(getResources(), R.drawable.fondo);
+        //boton     = BitmapFactory.decodeResource(getResources(), R.drawable.boton);
+
 
       }
 
     public void createEveryThing(){
-        controles = new Controles(this, boton);
+        //controles = new Controles(this, boton);
         nave = new Nave(this, bmp_nave);
+        bala = new Bala(this);
+        badnave = new BadNave(this, bmp_badnave1);
     }
 
     @Override
 
     protected void onDraw(Canvas canvas) {
 
-        canvas.drawBitmap(fondo, -100 , 0, null);
-        controles.onDraw(canvas);
-            /* Evita que dos hilos se ejecuten al mismo tiempo */
+        canvas.drawBitmap(fondo, 0 , 0, null);
+        //controles.onDraw(canvas);
         nave.onDraw(canvas);
-        controles.disparar(nave.posAncho, bmp_nave.getWidth(), nave.posAlto, bmp_nave.getHeight());
+        badnave.onDraw(canvas);
+        if ( nave.disparado()){
+
+            for (int i = 0; i < 3 ; i++) {
+
+                bala.onDraw(canvas, i, y);
+            }
+            bala.levantado = false;
+
+        }else{
+            bala.levantado = true;
+
+        }
+
+
+
     }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
 
-        // DoubleTouch
 
-        int pointerIndex  = ((event.getAction() & event.ACTION_POINTER_ID_MASK)
-                                                >> event.ACTION_POINTER_ID_SHIFT);
+        int action = MotionEventCompat.getActionMasked(event);
 
-        int pointerId = event.getPointerId(pointerIndex);
+        //Obtiene el index del pointer asociado con la accion
 
-        int action = (event.getAction() & event.ACTION_MASK);
-        int pointCnt = event.getPointerCount();
-
-        touched_x = (int) event.getX();
-        touched_y = (int) event.getY();
-
-        // Se obtiene el evento, ya sea tocar pantalla, levantar dedo o mover dedo
-
-        if (pointCnt <= MAX_POINT_CNT){
-            if(pointerIndex <= MAX_POINT_CNT - 1){
-                for (int i = 0; i < pointCnt; i++){
-                    int id = event.getPointerId(i);
-                    x_last[id] = x[id];
-                    y_last[id] = y[id];
-
-                    isTouch_last[id] = isTouch[id];
-
-                    x[id] = event.getX();
-                    y[id] = event.getY();
-                }
-
-                Log.e("tocado(x.y)","(" + touched_x + "," + touched_y + ")");
-
-                switch (action) {
-
-                    // Tocar la pantalla
-                    case MotionEvent.ACTION_DOWN:
-                        isTouch[pointerId] = true;
-                        touched = true;
-                        break;
-
-                    // Mover dedo sobre la pantalla
-                    case MotionEvent.ACTION_MOVE:
-                        isTouch[pointerId] = true;
-                        touched = true;
-                        break;
-
-                    // Levantar dedo de la pantalla
-                    case MotionEvent.ACTION_UP:
-                        isTouch[pointerId] = false;
-                        touched = false;
-                        break;
+        int index = MotionEventCompat.getActionIndex(event);
 
 
-                    case MotionEvent.ACTION_CANCEL:
-                        isTouch[pointerId] = false;
-                        touched = false;
-                        break;
+        if (event.getPointerCount() > 1) {
 
-                    case MotionEvent.ACTION_OUTSIDE:
-                        isTouch[pointerId] = false;
-                        touched = false;
-                        break;
 
-                    default:
-                        touched = false;
-                /* Nothing to do */
-                }
-            }
+            x = (int) MotionEventCompat.getX(event, index);
+            y = (int) MotionEventCompat.getY(event, index);
+
+            Log.e("Psociones", "(" + x + "," + y + ") " + index );
+
+            get_evento(action, true, indice);
+
+        } else {
+
+            x = (int) MotionEventCompat.getX(event, index);
+            y = (int) MotionEventCompat.getY(event, index);
+
+            Log.e("Psociones", "(" + x + "," + y + ") " + index );
+
+            get_evento(action, false, indice);
         }
 
-        //int daction = event.getAction();
-
-
         return true;
+    }
+
+
+    public void get_evento(int action, boolean sondos, int index_event){
+
+        switch (action) {
+
+            case MotionEvent.ACTION_DOWN:
+
+                touched = true;
+                multi = sondos;
+                indice = index_event;
+                //posBalaY = y;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+
+                touched = true;
+                multi = sondos;
+                indice = index_event;
+                break;
+
+            case MotionEvent.ACTION_POINTER_DOWN:
+
+                touched = true;
+                multi = sondos;
+                indice = index_event;
+                break;
+
+            case MotionEvent.ACTION_POINTER_UP:
+
+                touched = false;
+                multi = false;
+                break;
+
+            case MotionEvent.ACTION_UP:
+
+                touched = false;
+                multi = false;
+                break;
+
+            case MotionEvent.ACTION_OUTSIDE:
+
+                touched = false;
+                multi = false;
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+
+                touched = false;
+                multi = false;
+                break;
+
+        }
     }
 }

@@ -15,10 +15,11 @@ public class Nave {
     public int ancho;
     public int alto;
     public int posAlto = 100;
-    public int posAncho = 10;
+    public int posAncho = 30;
     public int bmpH;
     public int bmpW;
     public Controles controles;
+    public boolean disparado = false;
 
     public Nave(GameView gameView, Bitmap bitmap){
         this.gameview = gameView;
@@ -36,19 +37,31 @@ public class Nave {
         moverNave(canvas);
     }
 
-    public void moverNave(Canvas canvas){
+    public void moverNave(Canvas canvas) {
 
 
+        if(gameview.touched && gameview.x < gameview.getWidth() / 2 &&
+                gameview.x > posAncho && gameview.x < posAncho + bmpW &&
+                gameview.y > posAlto  && gameview.y < posAlto  + bmpH){
 
-        if(gameview.touched && gameview.touched_x > posAncho && gameview.touched_x < posAncho + bmpW &&
-                gameview.touched_y > posAlto && gameview.touched_y < posAlto + bmpH){
+            posAlto  =  gameview.y - bmpH / 2 ;
+            //posAncho =  gameview.x - bmpW / 2;
 
-            canvas.drawBitmap(nave, gameview.touched_x - bmpW / 2, gameview.touched_y - bmpH / 2, null);
-            posAlto = gameview.touched_y - bmpH / 2;
-            posAncho = gameview.touched_x - bmpW / 2;
+            canvas.drawBitmap(nave, posAncho, posAlto, null);
+            disparado = true;
+
         }else{
             canvas.drawBitmap(nave, posAncho, posAlto, null);
+            disparado = false;
         }
 
+    }
+
+    public boolean disparado() {
+        if (disparado) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
