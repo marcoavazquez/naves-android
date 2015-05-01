@@ -21,7 +21,8 @@ public class Nave {
     public Controles controles;
     public boolean disparado = false;
     public int vida = 200;
-
+    public int puntuacion;
+    public Paint score;
 
     public Nave(GameView gameView, Bitmap bitmap){
         this.gameview = gameView;
@@ -40,6 +41,11 @@ public class Nave {
     }
 
     public void moverNave(Canvas canvas) {
+        score = new Paint();
+        score.setColor(Color.GREEN);
+        score.setTextSize(gameview.getHeight()/20);
+        canvas.drawText("Puntos: " + get_puntuacion(), gameview.getHeight() / 2 - 50, 50, score );
+
 
 
         if(gameview.touched && gameview.x < gameview.getWidth() / 2 &&
@@ -87,5 +93,13 @@ public class Nave {
 
     public int get_vida() {
         return this.vida;
+    }
+
+    public void set_puntuacion(int i){
+        this.puntuacion += i;
+    }
+
+    public int get_puntuacion() {
+        return this.puntuacion;
     }
 }

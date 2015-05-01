@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import java.util.Random;
+
 
 public class BadNave {
 
@@ -15,12 +17,14 @@ public class BadNave {
     public int posX = 0;
     public int posY = 0;
     private int speedX = 12;
-    private int speedY = 21;
+    private int speedY = 17;
 
     public int vida = 100;
     public int nivel;
     public int nvl_indicador = nivel;
     public int diferencia;
+
+    Random rnd;
 
     public BadNave(GameView gameView, Bitmap bitmap){
 
@@ -29,6 +33,7 @@ public class BadNave {
     }
 
     public void onDraw(Canvas canvas){
+        rnd = new Random();
 
         this.diferencia = (gameView.getRight() / 3) - (gameView.getRight() / 15);
         this.nivel =  diferencia / 100;
@@ -36,12 +41,12 @@ public class BadNave {
 
         if ( posX >= gameView.getWidth()  - bmp.getWidth()  / 2 || posX + speedX <= 0) {
 
-            speedX = -speedX;
+            speedX = -(speedX + rnd.nextInt(6));
         }
 
         if ( posY >= gameView.getHeight() - bmp.getHeight() / 2 || posY + speedY <= 0) {
 
-            speedY = - speedY;
+            speedY = -(speedY + rnd.nextInt(4));
 
         }
 

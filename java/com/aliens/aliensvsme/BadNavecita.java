@@ -15,7 +15,7 @@ public class BadNavecita {
     public int speedX = 11;
     public int speedY = 13;
 
-    public int vida = 5;
+    public int vida = 10;
 
     public Random rnd;
 

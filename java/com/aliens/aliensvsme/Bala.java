@@ -20,7 +20,7 @@ public class Bala {
 
     public void onDraw(Canvas canvas,int i, int y){
         bala = new Paint();
-        bala.setColor(Color.WHITE);
+        bala.setColor(Color.BLUE);
         bala.setStyle(Paint.Style.FILL);
 
         x += 25;
@@ -35,7 +35,7 @@ public class Bala {
             posInicialY = y;
         }
 
-        canvas.drawCircle(x + 10, posInicialY, 5, bala);
+        canvas.drawCircle(x-20, posInicialY, 6, bala);
 
     }
 

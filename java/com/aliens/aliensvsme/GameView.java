@@ -22,7 +22,7 @@ import static java.lang.Thread.sleep;
 public class GameView extends SurfaceView {
 
     private Bitmap bmp_nave;
-    private Bitmap fondo;
+    //private Bitmap fondo;
     private Bitmap bmp_badnave1;
     private Bitmap bmp_bad_navecita;
 
@@ -33,6 +33,7 @@ public class GameView extends SurfaceView {
     private BadNave badnave;
     private List<BadNavecita> badNavecita = new ArrayList<BadNavecita>();
     private Bala bala;
+    private List<Fondo> estrella = new ArrayList<Fondo>();
 
     public boolean touched;
     public boolean multi;
@@ -83,17 +84,29 @@ public class GameView extends SurfaceView {
         bmp_bad_navecita = BitmapFactory.decodeResource(getResources(), R.drawable.badnavecita);
         bmp_badnave1 = BitmapFactory.decodeResource(getResources(), R.drawable.badnave1);
 
-        fondo        = BitmapFactory.decodeResource(getResources(), R.drawable.fondo);
+        //fondo        = BitmapFactory.decodeResource(getResources(), R.drawable.fondo);
 
 
       }
 
     public void createEveryThing(){
         //controles = new Controles(this, boton);
+        rnd = new Random();
+
+        for (int i = 0; i < 25; i++) {
+            synchronized (getHolder()){
+                try {
+                    sleep(20);
+                    estrella.add(new Fondo(this,rnd.nextInt(this.getWidth()), rnd.nextInt(this.getHeight())));
+                } catch (Exception e) {}
+            }
+
+        }
+
         nave = new Nave(this, bmp_nave);
         bala = new Bala(this);
         badnave = new BadNave(this, bmp_badnave1);
-        rnd = new Random();
+
         for (int i = 0; i < 10 ; i++) {
             badNavecita.add(new BadNavecita(this, bmp_bad_navecita, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
         }
@@ -103,8 +116,15 @@ public class GameView extends SurfaceView {
     @Override
 
     protected void onDraw(Canvas canvas) {
+        canvas.drawColor(Color.BLACK);
 
-        canvas.drawBitmap(fondo, 0 , 0, null);
+        for (Fondo estrellas : estrella) {
+            estrellas.onDraw(canvas);
+
+        }
+
+
+        //canvas.drawBitmap(fondo, 0 , 0, null);
         //controles.onDraw(canvas);
 
         if (nave.get_vida() > 0) {
@@ -118,9 +138,9 @@ public class GameView extends SurfaceView {
             badnave.indicadorVida(canvas);
         }
 
-        if ( nave.disparado()){
+        if ( nave.disparado() &&  nave.get_vida() > 0){
 
-            for (int i = 0; i < 2 ; i++) {
+            for (int i = 0; i < 8 ; i++) {
 
                 bala.onDraw(canvas, i, y);
             }
@@ -153,6 +173,7 @@ public class GameView extends SurfaceView {
             dibujarGolpe(canvas, bx, by);
             badnave.set_vida(1);
             badnave.set_nvl_indicador(badnave.get_nivel());//) += badnave.nivel;
+            nave.set_puntuacion(15);
         }
 
     }
@@ -172,13 +193,13 @@ public class GameView extends SurfaceView {
                 if ( bn.leHasDado(bala.get_x(), bala.get_posInicialY()) ){
 
                     dibujarGolpe(canvas, bala.get_x(), bala.get_posInicialY());
-
+                    nave.set_puntuacion(10);
 
                     bn.set_vida(1);
 
 
                     if (bn.get_vida() == 0){
-
+                        nave.set_puntuacion(20);
                         badNavecita.remove(bn);
                         break;
                     }
@@ -189,7 +210,7 @@ public class GameView extends SurfaceView {
 
     public void dibujarGolpe(Canvas canvas, int x, int y){
         Paint golpe = new Paint();
-        golpe.setColor(Color.MAGENTA);
+        golpe.setColor(Color.RED);
         golpe.setStyle(Paint.Style.FILL);
         canvas.drawCircle(x - 5,y - 5, 30, golpe);
     }
