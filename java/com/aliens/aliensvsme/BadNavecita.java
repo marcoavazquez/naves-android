@@ -12,8 +12,10 @@ public class BadNavecita {
     public Bitmap bmp;
     public int posX;
     public int posY;
-    public int speedX = 10;
-    public int speedY = 14;
+    public int speedX = 11;
+    public int speedY = 13;
+
+    public int vida = 5;
 
     public Random rnd;
 
@@ -29,14 +31,14 @@ public class BadNavecita {
     public void onDraw(Canvas canvas){
         rnd = new Random();
 
-        if ( posX >= gameView.getWidth()  - bmp.getWidth() || posX + speedX <= 150) {
+        if ( posX >= gameView.getWidth()  - 50 || posX + speedX <= 100) {
 
-            speedX = -speedX;
+            speedX = - (speedX + rnd.nextInt(3));
         }
 
-        if ( posY >= gameView.getHeight() + bmp.getHeight() || posY + speedY <= 0) {
+        if ( posY >= gameView.getHeight() + 50 || posY + speedY <= -50) {
 
-            speedY = - speedY;
+            speedY = - (speedY + rnd.nextInt(5));
 
         }
 
@@ -44,6 +46,36 @@ public class BadNavecita {
         posY += speedY;
 
         canvas.drawBitmap(bmp, posX, posY, null);
+    }
+
+    public boolean leHasDado(int posBalaX, int posBalaY){
+
+        return posBalaX >= posX && posBalaX <= posX + bmp.getWidth() &&
+               posBalaY >= posY && posBalaY <= posY + bmp.getHeight();
+    }
+
+    public int get_vida(){
+        return this.vida;
+    }
+
+    public void set_vida(int i) {
+        this.vida -= i;
+    }
+
+    public int get_posX() {
+        return this.posX;
+    }
+
+    public int get_posY() {
+        return this.posY;
+    }
+
+    public int get_width() {
+        return this.bmp.getWidth();
+    }
+
+    public int get_height() {
+        return this.bmp.getHeight();
     }
 
 }

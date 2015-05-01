@@ -20,6 +20,8 @@ public class Nave {
     public int bmpW;
     public Controles controles;
     public boolean disparado = false;
+    public int vida = 200;
+
 
     public Nave(GameView gameView, Bitmap bitmap){
         this.gameview = gameView;
@@ -57,11 +59,33 @@ public class Nave {
 
     }
 
+    public void indicadorVida(Canvas canvas) {
+        Paint indicador = new Paint();
+        indicador.setColor(Color.GREEN);
+        indicador.setStyle(Paint.Style.FILL);
+        canvas.drawRect(gameview.getLeft() + 10, 50, vida, 40, indicador);
+
+    }
+
+
     public boolean disparado() {
         if (disparado) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public boolean meHanDado(int navex, int navey) {
+        return navex >= posAncho && navex <= posAncho + nave.getWidth() &&
+               navey >= posAlto  && navey <= posAlto  + nave.getHeight();
+    }
+
+    public void set_vida(int i) {
+        this.vida -= i;
+    }
+
+    public int get_vida() {
+        return this.vida;
     }
 }

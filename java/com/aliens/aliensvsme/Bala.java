@@ -12,7 +12,7 @@ public class Bala {
     public Paint bala;
     public int posInicialY = 200;
 
-    public int x = 100;
+    public int x = 200;
 
     public Bala(GameView gameView){
         this.gameView    = gameView;
@@ -27,15 +27,28 @@ public class Bala {
 
         if (x >= gameView.getWidth() && !levantado ) {
 
-            x = 100;
+            x = 200;
             posInicialY = y;
         }
         if( levantado) {
-            x = 100;
+            x = 200;
+            posInicialY = y;
         }
 
-        canvas.drawCircle(x + (i * 10), posInicialY, 10, bala);
+        canvas.drawCircle(x + 10, posInicialY, 5, bala);
 
+    }
+
+    public int get_x(){
+        return this.x;
+    }
+
+    public int get_posInicialY() {
+        return this.posInicialY;
+    }
+
+    public void set_levantado(Boolean bol) {
+        this.levantado = bol;
     }
 
 }
