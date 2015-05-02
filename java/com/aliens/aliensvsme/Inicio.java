@@ -10,7 +10,6 @@ public class Inicio {
 
     public GameView gameView;
 
-
     public Boolean iniciado = false;
     public Paint mensaje;
     public Paint boton;
@@ -19,12 +18,6 @@ public class Inicio {
 
     public Inicio(GameView gameView) {
         this.gameView = gameView;
-    }
-
-
-
-    public void set_iniciado(Boolean iniciado) {
-        this.iniciado = iniciado;
     }
 
     public Boolean get_iniciado() {
@@ -42,7 +35,6 @@ public class Inicio {
         boton = new Paint();
         boton.setColor(Color.WHITE);
         canvas.drawCircle(gameView.getWidth() / 2, gameView.getHeight() / 2, gameView.getWidth() / 10, boton);
-
 
         msg_boton = new Paint();
         msg_boton.setColor(Color.RED);

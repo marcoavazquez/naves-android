@@ -30,11 +30,6 @@ public class BadNavecita {
         this.bmp = bitmap;
     }
 
-    public void setVida(int vida) {
-        this.vida = vida;
-    }
-
-
     public void onDraw(Canvas canvas){
         rnd = new Random();
 
@@ -75,14 +70,6 @@ public class BadNavecita {
 
     public int get_posY() {
         return this.posY;
-    }
-
-    public int get_width() {
-        return this.bmp.getWidth();
-    }
-
-    public int get_height() {
-        return this.bmp.getHeight();
     }
 
 }

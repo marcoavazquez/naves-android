@@ -58,12 +58,4 @@ public class GameLoopThread extends Thread {
             }catch (Exception e) { }
         }
     }
-
-
-    public void continuar() {
-        this.running = true;
-
-    }
-
-
 }

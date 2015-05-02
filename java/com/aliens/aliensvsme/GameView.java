@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.camera2.params.BlackLevelPattern;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -91,11 +90,9 @@ public class GameView extends SurfaceView {
         bmp_nave  = BitmapFactory.decodeResource(getResources(), R.drawable.nave1);
         pausa  = BitmapFactory.decodeResource(getResources(), R.drawable.pausa);
 
-
         const1 = BitmapFactory.decodeResource(getResources(), R.drawable.const1);
         const2 = BitmapFactory.decodeResource(getResources(), R.drawable.const2);
         const3 = BitmapFactory.decodeResource(getResources(), R.drawable.const3);
-
 
         bmp_badnave1 = BitmapFactory.decodeResource(getResources(), R.drawable.badnave1);
         bmp_bad_navecita2 = BitmapFactory.decodeResource(getResources(), R.drawable.badnavecita2);
@@ -121,7 +118,6 @@ public class GameView extends SurfaceView {
                     estrella.add(new Fondo(this,rnd.nextInt(this.getWidth()), rnd.nextInt(this.getHeight())));
                 } catch (Exception e) {}
             }
-
         }
 
         nave = new Nave(this);
@@ -131,22 +127,17 @@ public class GameView extends SurfaceView {
         for (int i = 0; i < 10 ; i++) {
             badNavecita.add(new BadNavecita(this, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
         }
-
     }
 
     @Override
 
     protected void onDraw(Canvas canvas) {
 
-
         if (inicio.get_iniciado() && !escenario.getFueConstSeleccionada()) {
 
             elegirConstelacion(canvas);
-
-
         }
         if (inicio.get_iniciado() && escenario.getFueSeleccionada()) {
-
 
             if (escenario.getNaveSeleccionada() == 1){
                 color = Color.BLACK;
@@ -182,19 +173,15 @@ public class GameView extends SurfaceView {
                 }
             }
 
-
             batalla(canvas, bmp_nave, Color.WHITE, color, velocidad);
             escenario.setFueConstSeleccionada(true);
 
             canvas.drawBitmap(pausa, this.getWidth() - (this.getWidth()/20), this.getHeight() - (this.getHeight() / 10), null);
 
-
             pausar();
 
             continuar(canvas);
-
         }
-
 
         if (!inicio.get_iniciado()) {
 
@@ -202,12 +189,9 @@ public class GameView extends SurfaceView {
 
             for (Fondo estrellas : estrella) {
                 estrellas.onDraw(canvas, Color.YELLOW, 30, 5);
-
             }
-
             inicio.onDraw(canvas);
             inicio.comenzar();
-
         }
     }
 
@@ -236,9 +220,7 @@ public class GameView extends SurfaceView {
 
             escenario.setNaveSeleccionada(2);
             escenario.setFueSeleccionada(true);
-
         }
-
 
         if ( touched &&
                 x >= this.getWidth() / 10  && x <= this.getWidth() / 10 + const1.getWidth() &&
@@ -246,7 +228,6 @@ public class GameView extends SurfaceView {
 
             escenario.setNaveSeleccionada(1);
             escenario.setFueSeleccionada(true);
-
         }
 
         if( touched &&
@@ -259,7 +240,6 @@ public class GameView extends SurfaceView {
 
     }
 
-
     public void golpearNaveMayor(Canvas canvas, int bx, int by) {
 
         if ( badnave.leHasDado(bx, by) && badnave.get_vida() > 0 ) {
@@ -268,7 +248,6 @@ public class GameView extends SurfaceView {
             badnave.set_nvl_indicador(badnave.get_nivel());//) += badnave.nivel;
             nave.set_puntuacion(15);
         }
-
     }
 
 
@@ -311,16 +290,13 @@ public class GameView extends SurfaceView {
     @Override
     public boolean onTouchEvent(MotionEvent event){
 
-
         int action = MotionEventCompat.getActionMasked(event);
 
         //Obtiene el index del pointer asociado con la accion
 
         int index = MotionEventCompat.getActionIndex(event);
 
-
         if (event.getPointerCount() > 1) {
-
 
             x = (int) MotionEventCompat.getX(event, index);
             y = (int) MotionEventCompat.getY(event, index);
@@ -334,7 +310,6 @@ public class GameView extends SurfaceView {
 
             get_evento(action, false, indice);
         }
-
         return true;
     }
 
@@ -348,7 +323,6 @@ public class GameView extends SurfaceView {
                 touched = true;
                 multi = sondos;
                 indice = index_event;
-                //posBalaY = y;
                 Log.e("resume", "(ne" + "marco");
 
                 if (!gameLoopThread.getRunning()) {
@@ -408,12 +382,10 @@ public class GameView extends SurfaceView {
 
         }
 
-
         if (nave.get_vida() > 0) {
             nave.onDraw(canvas, bmp_nave);
             nave.indicadorVida(canvas);
         }
-
 
         if (badnave.vida > 0) {
             badnave.onDraw(canvas);
@@ -444,9 +416,6 @@ public class GameView extends SurfaceView {
         if (nave.meHanDado(badnave.get_posX(), badnave.get_posY())) {
             nave.set_vida(2);
         }
-
-        //Log.e("Vida de ni nave: ", nave.get_vida() + " <");
-
     }
 
     public void pausar() {
@@ -462,10 +431,7 @@ public class GameView extends SurfaceView {
                 Log.e("Pausa", "(ire" + gameLoopThread.getState());
                 Log.e("Pausa", "ire" + gameLoopThread.getRunning());
             }
-
-
         }
-
     }
 
     public void continuar(Canvas canvas) {
@@ -481,13 +447,9 @@ public class GameView extends SurfaceView {
                 y <= this.getHeight() / 2 - (resume.getHeight() / 2) &&
                 y >= this.getHeight() / 2 - (resume.getHeight() / 2) + resume.getHeight()
             ){
-
                 gameLoopThread.setRunning(true);
                 Log.e("resume", "(ne" + gameLoopThread.getRunning());
-
-
             }
-
-                    }
+        }
     }
 }

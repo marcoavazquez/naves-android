@@ -2,10 +2,8 @@ package com.aliens.aliensvsme;
 
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 
-import java.util.Random;
 
 public class Fondo {
 
@@ -15,7 +13,6 @@ public class Fondo {
     public GameView gameView;
     public int x;
     public int y = 1;
-    Random rnd = new Random();
 
 
     public Fondo(GameView gameView,int x, int y) {
@@ -23,11 +20,9 @@ public class Fondo {
         this.x = x;
 
         this.y = y;
-
     }
 
     public void onDraw(Canvas canvas, int color, int velocidad, int tamano) {
-
 
         estrellas     = new Paint();
         estrellas2    = new Paint();
@@ -41,8 +36,6 @@ public class Fondo {
         estrellas.setColor(color);
         estrellas.setStyle(Paint.Style.FILL);
         canvas.drawCircle(x, y, tamano, estrellas);
-
-
 
     }
 

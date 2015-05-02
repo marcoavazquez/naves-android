@@ -18,7 +18,6 @@ public class Nave {
     public int posAncho = 30;
     public int bmpH;
     public int bmpW;
-    public Controles controles;
     public boolean disparado = false;
     public int vida = 200;
     public int puntuacion;
@@ -30,9 +29,6 @@ public class Nave {
 
         this.alto  = gameView.getHeight();
         this.ancho = gameView.getWidth();
-
-
-
     }
 
     public void onDraw(Canvas canvas , Bitmap bitmap){
@@ -48,8 +44,6 @@ public class Nave {
         score.setTextSize(gameview.getHeight() / 20);
         score.setTextAlign(Paint.Align.CENTER);
         canvas.drawText("Puntos: " + get_puntuacion(), gameview.getWidth() / 2, 50, score );
-
-
 
         if(gameview.touched && gameview.x < gameview.getWidth() / 2 &&
                 gameview.x > posAncho && gameview.x < posAncho + bmpW &&
