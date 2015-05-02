@@ -13,7 +13,11 @@ public class GameLoopThread extends Thread {
     }
 
     public void setRunning(boolean run){
-        running = run;
+        this.running = run;
+    }
+
+    public boolean getRunning() {
+        return this.running;
     }
 
     @Override
@@ -54,4 +58,12 @@ public class GameLoopThread extends Thread {
             }catch (Exception e) { }
         }
     }
+
+
+    public void continuar() {
+        this.running = true;
+
+    }
+
+
 }

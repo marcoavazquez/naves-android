@@ -20,7 +20,7 @@ public class Bala {
 
     public void onDraw(Canvas canvas,int i, int y){
         bala = new Paint();
-        bala.setColor(Color.BLUE);
+        bala.setColor(Color.RED);
         bala.setStyle(Paint.Style.FILL);
 
         x += 25;

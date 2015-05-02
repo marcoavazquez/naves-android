@@ -24,27 +24,30 @@ public class Nave {
     public int puntuacion;
     public Paint score;
 
-    public Nave(GameView gameView, Bitmap bitmap){
+    public Nave(GameView gameView){
         this.gameview = gameView;
-        this.nave     = bitmap;
+
 
         this.alto  = gameView.getHeight();
         this.ancho = gameView.getWidth();
 
-        this.bmpH = bitmap.getHeight();
-        this.bmpW = bitmap.getWidth();
+
 
     }
 
-    public void onDraw(Canvas canvas){
+    public void onDraw(Canvas canvas , Bitmap bitmap){
+        this.nave     = bitmap;
+        this.bmpH = bitmap.getHeight();
+        this.bmpW = bitmap.getWidth();
         moverNave(canvas);
     }
 
     public void moverNave(Canvas canvas) {
         score = new Paint();
-        score.setColor(Color.GREEN);
-        score.setTextSize(gameview.getHeight()/20);
-        canvas.drawText("Puntos: " + get_puntuacion(), gameview.getHeight() / 2 - 50, 50, score );
+        score.setColor(Color.GRAY);
+        score.setTextSize(gameview.getHeight() / 20);
+        score.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("Puntos: " + get_puntuacion(), gameview.getWidth() / 2, 50, score );
 
 
 

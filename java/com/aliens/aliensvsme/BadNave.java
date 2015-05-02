@@ -26,10 +26,16 @@ public class BadNave {
 
     Random rnd;
 
-    public BadNave(GameView gameView, Bitmap bitmap){
+    public BadNave(GameView gameView){
 
         this.gameView = gameView;
-        this.bmp      = bitmap;
+    }
+
+    public void setBitmap(Bitmap bmp) {
+        this.bmp = bmp;
+    }
+    public void setSalud(int vida) {
+        this.vida = vida;
     }
 
     public void onDraw(Canvas canvas){
@@ -41,12 +47,12 @@ public class BadNave {
 
         if ( posX >= gameView.getWidth()  - bmp.getWidth()  / 2 || posX + speedX <= 0) {
 
-            speedX = -(speedX + rnd.nextInt(6));
+            speedX = -(speedX + rnd.nextInt(4));
         }
 
         if ( posY >= gameView.getHeight() - bmp.getHeight() / 2 || posY + speedY <= 0) {
 
-            speedY = -(speedY + rnd.nextInt(4));
+            speedY = -(speedY + rnd.nextInt(2));
 
         }
 
@@ -64,10 +70,10 @@ public class BadNave {
 
     public void indicadorVida(Canvas canvas) {
 
-        //Log.e("dif, v, ind, nv ", diferencia + ", " + vida + "," + nvl_indicador + "," + nivel);
+        Log.e("vida ", diferencia + ", " + vida);
 
         Paint indicador = new Paint();
-        indicador.setColor(Color.MAGENTA);
+        indicador.setColor(Color.RED);
         indicador.setStyle(Paint.Style.FILL);
         canvas.drawRect(gameView.getRight() - gameView.getRight() / 3 + (nivel * 5) + nvl_indicador, 50, (gameView.getRight() - (gameView.getRight() / 15)), 40, indicador);
 

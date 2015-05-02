@@ -19,12 +19,19 @@ public class BadNavecita {
 
     public Random rnd;
 
-    public BadNavecita(GameView gameView, Bitmap bitmap, int x, int y) {
+    public BadNavecita(GameView gameView, int x, int y) {
         this.gameView = gameView;
-        this.bmp      = bitmap;
 
         this.posX = x;
         this.posY = y;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bmp = bitmap;
+    }
+
+    public void setVida(int vida) {
+        this.vida = vida;
     }
 
 

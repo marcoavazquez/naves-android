@@ -26,21 +26,21 @@ public class Fondo {
 
     }
 
-    public void onDraw(Canvas canvas) {
+    public void onDraw(Canvas canvas, int color, int velocidad, int tamano) {
 
 
         estrellas     = new Paint();
         estrellas2    = new Paint();
 
-        x -= 10;
+        x -= velocidad;
 
         if (x < 0) {
             x = gameView.getWidth();
         }
 
-        estrellas.setColor(Color.WHITE);
+        estrellas.setColor(color);
         estrellas.setStyle(Paint.Style.FILL);
-        canvas.drawCircle(x, y, 4, estrellas);
+        canvas.drawCircle(x, y, tamano, estrellas);
 
 
 
