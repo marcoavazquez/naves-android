@@ -11,18 +11,19 @@ import java.util.Random;
 
 public class BadNave {
 
-    private GameView gameView;
-    private Bitmap bmp;
+    private GameView gameView;  // Instancia de la vista de la pantalla para obtener tamaños de esta
 
-    public int posX = 0;
-    public int posY = 0;
-    private int speedX = 12;
-    private int speedY = 17;
+    private Bitmap bmp; // Variable que almacena la imagen de la nave
 
-    public int vida = 100;
-    public int nivel;
+    public int posX = 0;    //posicion de la nave en X
+    public int posY = 0;        //posicion de la nave en Y
+    private int speedX = 12;    // Velocidad inicial en la que se mueve la nave en X
+    private int speedY = 17;    // Velocidad inicial en la que se mueve la nave en Y
+
+    public int vida = 100;      // Nivel de salud de la nave
+    public int nivel;           // Cantidad de nivel de salud a diminuir por cada golpe de acuerdo al indicador
     public int nvl_indicador = nivel;
-    public int diferencia;
+    public int diferencia;     // valor de vida, para el indicador en pixeles
 
     Random rnd;
 
@@ -36,7 +37,7 @@ public class BadNave {
     }
 
 
-    public void onDraw(Canvas canvas){
+    public void onDraw(Canvas canvas){ // Dibuja la NAVE y su movimiento
         rnd = new Random();
 
         this.diferencia = (gameView.getRight() / 3) - (gameView.getRight() / 15);
@@ -60,7 +61,7 @@ public class BadNave {
         canvas.drawBitmap(bmp, posX, posY, null);
     }
 
-    public boolean leHasDado(int posBalaX, int posBalaY){
+    public boolean leHasDado(int posBalaX, int posBalaY){ // Si has golpeado la nave
 
         return posBalaX >= posX && posBalaX <= posX + bmp.getWidth() &&
                 posBalaY >= posY && posBalaY <= posY + bmp.getHeight();
