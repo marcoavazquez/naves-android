@@ -19,7 +19,7 @@ public class Nave {
     public int bmpH;
     public int bmpW;
     public boolean disparado = false;
-    public int vida = 200;
+    public int vida = 0;
     public int puntuacion;
     public Paint score;
 
@@ -43,7 +43,7 @@ public class Nave {
         score.setColor(Color.GRAY);
         score.setTextSize(gameview.getHeight() / 20);
         score.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("Puntos: " + get_puntuacion(), gameview.getWidth() / 2, 50, score );
+        canvas.drawText("Puntos: " + get_puntuacion(), gameview.getWidth() / 2, 50, score);
 
         if(gameview.touched && gameview.x < gameview.getWidth() / 2 &&
                 gameview.x > posAncho && gameview.x < posAncho + bmpW &&
@@ -98,5 +98,9 @@ public class Nave {
 
     public int get_puntuacion() {
         return this.puntuacion;
+    }
+
+    public void setSalud(int s) {
+        this.vida = s;
     }
 }

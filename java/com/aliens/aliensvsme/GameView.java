@@ -30,7 +30,7 @@ public class GameView extends SurfaceView {
     // Los bitmaps son todoas la imagenes que se usaran
 
     // Tu nave
-    private Bitmap bmp_nave;
+    private Bitmap bmp_nave, xplo;
 
     // Las diferentes naves malvadas grandes
     private Bitmap bmp_badnave1,bmp_badnave2,bmp_badnave3;
@@ -77,12 +77,15 @@ public class GameView extends SurfaceView {
     public boolean multi;// Esta variable no tiene un uso, solo detecta si se ha tocado la pantalla con mas de un dedo
 
     //variables para darle a las constelaciones color de fondo, color de estrella y velocidad, la variable indice no tiene uso.
-    public int indice, color, colorEstrella, velocidad;
+    public int indice, colorEstrella, velocidad, nivel = 0, fondoColor;
 
     public int x; //variable que determina tu posicion en X
     public int y; //variable que determina tu posicion en Y
 
     private int danho; //VAriable que determina en daño que les causas a las naves enemigas dependiendo el nivel
+
+    private List<TempSprite> temps = new ArrayList<TempSprite>();
+
 
     Random rnd; // Variable para obtener un numero aleatorio para que las naves y estrellas se muestren en lugares al azar
 
@@ -151,6 +154,10 @@ public class GameView extends SurfaceView {
         bmp_bad_navecita3 = BitmapFactory.decodeResource(getResources(), R.drawable.badnavecita3);
         bmp_badnave3 = BitmapFactory.decodeResource(getResources(), R.drawable.badnave3);
 
+        xplo = BitmapFactory.decodeResource(getResources(), R.drawable.xplo);
+
+
+
 
       }
 
@@ -177,7 +184,7 @@ public class GameView extends SurfaceView {
         bala = new Bala(this); // las balas que lanzan las naves
         badnave = new BadNave(this); // la nave mayor enemiga
 
-        for (int i = 0; i < 10 ; i++) {
+        for (int i = 0; i < 5 ; i++) {
 
             // se crean las naves pequeñas enemigas, 10 veces
             badNavecita.add(new BadNavecita(this, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
@@ -189,26 +196,28 @@ public class GameView extends SurfaceView {
     @Override
 
     protected void onDraw(Canvas canvas) {
-
+        Log.e("Mi Vida", "(" + nave.get_vida());
         if (inicio.get_iniciado() && !escenario.getFueConstSeleccionada()) {
+
 
             elegirConstelacion(canvas); // Si se ha tocado Comenzar aparece elegir constelacion, este metodo guarda la constelacion elegida
         }
         if (inicio.get_iniciado() && escenario.getFueSeleccionada()) { // Si ya se seleccionó constelacion se ejecuta esto:
 
-            if (escenario.getNaveSeleccionada() == 1){ // Si se seleccionó la primera constelacion carga lo siguiene:
-                color = Color.BLACK; // Fondo negro
+            if (escenario.getNaveSeleccionada() == 1 && nivel == 0){ // Si se seleccionó la primera constelacion carga lo siguiene:
+
+                fondoColor = Color.BLACK; // Fondo negro
                 colorEstrella = Color.WHITE; // EStrellas blancas
                 velocidad = 20; // Velocidad de estrellas
                 badnave.setBitmap(bmp_badnave1); // La nave malvada
-                danho = 5; // El daño que le provocas
+                danho = 10; // El daño que le provocas
 
                 for ( int i = 0; i < badNavecita.size(); i ++) {
                     BadNavecita bnvct = badNavecita.get(i);
                     bnvct.setBitmap(bmp_bad_navecita2); // las navecitas enemigas
                 }
 
-            }else if (escenario.getNaveSeleccionada() == 2) { // Similar que lo anterior pero con otros valores
+            }/*else if (escenario.getNaveSeleccionada() == 2) { // Similar que lo anterior pero con otros valores
                 color = Color.BLUE;
                 colorEstrella = Color.GREEN;
                 velocidad = 15;
@@ -227,10 +236,11 @@ public class GameView extends SurfaceView {
                 for ( int i = 0; i < badNavecita.size(); i ++) {
                     BadNavecita bnvct = badNavecita.get(i);
                     bnvct.setBitmap(bmp_bad_navecita3);
-                }
-            }
+                }*/
 
-            batalla(canvas, Color.WHITE, color, velocidad); // CArga la pantalla de batalla con los valores dados anteriormente
+
+            batalla(canvas); // CArga la pantalla de batalla con los valores dados anteriormente
+
             escenario.setFueConstSeleccionada(true); // metodo para hacer desaparecer la pantalla de seleccion
 
             // Dibuja el boton de pausa
@@ -245,6 +255,12 @@ public class GameView extends SurfaceView {
 
         if (!inicio.get_iniciado()) { // Esto es lo que muestra al ejecutar el juego
 
+            escenario.setFueConstSeleccionada(false);
+            escenario.setFueSeleccionada(false);
+            nave.setSalud(50);
+            nivel = 0;
+            nave.puntuacion = 0;
+            Log.e("Inicio", "-");
             canvas.drawColor(Color.BLUE); // Color de fondo
 
             for (Fondo estrellas : estrella) {
@@ -275,19 +291,19 @@ public class GameView extends SurfaceView {
         //Muestra las imagenes de los tres niveles a elegir:
                          // img , posicion en X       , posicion en Y       ,
         canvas.drawBitmap(const1, this.getWidth() / 10, this.getHeight() / 2, null);
-        canvas.drawBitmap(const2, (this.getWidth() / 10) * 4, this.getHeight() / 2, null);
-        canvas.drawBitmap(const3, (this.getWidth() / 10) * 7, this.getHeight() / 2, null);
+        //canvas.drawBitmap(const2, (this.getWidth() / 10) * 4, this.getHeight() / 2, null);
+        //canvas.drawBitmap(const3, (this.getWidth() / 10) * 7, this.getHeight() / 2, null);
 
         // Este if es para saber que imagen has tocado, este es para la segunda (no primera, está asi solo porque olvide corregir pero no influye en el juego).
 
-        if( touched && // si se ha tocado
+        /*if( touched && // si se ha tocado
              // X y Y es donde has tocado, sí es en donde se encuesntra esta imagen, se ejecuta
                 x >= (this.getWidth() / 10) * 4  && x <= (this.getWidth() / 10) * 4 + const2.getWidth() &&
                 y >= this.getHeight() / 2 && y <= this.getHeight() / 2 + const2.getHeight()){
 
             escenario.setNaveSeleccionada(2); // Se le indica que se ha seleccionado el escenario 2
             escenario.setFueSeleccionada(true); // y que ha sido seleccionada
-        }
+        }*/
         // para la segunda
         if ( touched &&
                 x >= this.getWidth() / 10  && x <= this.getWidth() / 10 + const1.getWidth() &&
@@ -296,21 +312,21 @@ public class GameView extends SurfaceView {
             escenario.setNaveSeleccionada(1);
             escenario.setFueSeleccionada(true);
         }
-        // para la tercera
+        /*/ para la tercera
         if( touched &&
                 x >= (this.getWidth() / 10) * 7  && x <= (this.getWidth() / 10) * 7 + const3.getWidth() &&
                 y >= this.getHeight() / 2 && y <= this.getHeight() / 2 + const3.getHeight()){
 
             escenario.setNaveSeleccionada(3);
             escenario.setFueSeleccionada(true);
-        }
+        }*/
 
     }
 
     public void golpearNaveMayor(Canvas canvas, int bx, int by) {  // Se ejecuta si una bala ha golpeado a la nave mayor
 
         if ( badnave.leHasDado(bx, by) && badnave.get_vida() > 0 ) {
-            dibujarGolpe(canvas, bx, by); // Dibuja el golpe
+            dibujarGolpe(canvas, bx, by, Color.RED); // Dibuja el golpe
             badnave.set_vida(danho); // Se le quita vida
             badnave.set_nvl_indicador(badnave.get_nivel());// Para que el indicador baje
             nave.set_puntuacion(15); // Sube tu puntaje
@@ -327,11 +343,12 @@ public class GameView extends SurfaceView {
 
                 if (nave.meHanDado(bn.get_posX(), bn.get_posY())){  // si una navecita me ha golpeado
                     nave.set_vida(1);   // se me quita Salud o Vida
+                    dibujarGolpe(canvas, nave.posAncho + nave.bmpW, nave.posAlto + nave.bmpH, Color.YELLOW);
                 }
 
                 if ( bn.leHasDado(bala.get_x(), bala.get_posInicialY()) ){ // Si yo he golpeado a una
 
-                    dibujarGolpe(canvas, bala.get_x(), bala.get_posInicialY()); // Dibuja golpe
+                    dibujarGolpe(canvas, bala.get_x(), bala.get_posInicialY(),Color.RED); // Dibuja golpe
                     nave.set_puntuacion(10); // Aumenta puntuacion
 
                     bn.set_vida(danho);  // Quita Salud o Vida a nave
@@ -347,9 +364,9 @@ public class GameView extends SurfaceView {
         }
     }
 
-    public void dibujarGolpe(Canvas canvas, int x, int y){  // Dibuja el golpe al darle con una bala
+    public void dibujarGolpe(Canvas canvas, int x, int y, int color){  // Dibuja el golpe al darle con una bala
         Paint golpe = new Paint();
-        golpe.setColor(Color.RED);
+        golpe.setColor(color);
         golpe.setStyle(Paint.Style.FILL);
         canvas.drawCircle(x - 5,y - 5, 30, golpe);
     }
@@ -444,13 +461,17 @@ public class GameView extends SurfaceView {
 
     // Este metodo dibuja la Batalla, obtiene como parametros:
                                       // Color de estrellas, color fondo,  velocidad estrella
-    public void batalla(Canvas canvas, int estrellaColor, int fondoColor, int estrellaVelocidad){
+    public void batalla(Canvas canvas){
 
         canvas.drawColor(fondoColor); // Da el color de fondo
 
         for (Fondo estrellas : estrella) {
-            estrellas.onDraw(canvas, estrellaColor, 10, 5); // Dibuja las estrellas
+            estrellas.onDraw(canvas, colorEstrella, velocidad, 5); // Dibuja las estrellas
 
+        }
+
+        for (int i = temps.size() - 1; i >= 0; i--) {
+            temps.get(i).onDraw(canvas);
         }
 
         if (nave.get_vida() > 0) { // Dibuja minave si aun tengo VIDA o Salud
@@ -486,10 +507,114 @@ public class GameView extends SurfaceView {
 
         if (nave.meHanDado(badnave.get_posX(), badnave.get_posY())) { // si me tocan las naves enemigas
             nave.set_vida(2); // Si me han tocado me disminuye la vida en 2
+            dibujarGolpe(canvas, nave.posAncho + nave.bmpW, nave.posAlto + nave.bmpH, Color.YELLOW);
+        }
+
+        if (nave.get_vida() <= 0){
+            temps.add(new TempSprite(temps, this, nave.posAncho, nave.posAlto, xplo));
+            gameOver(canvas);
+        }
+
+        if (badnave.get_vida() == 0) {
+            temps.add(new TempSprite(temps, this, badnave.get_posX(), badnave.get_posY(), xplo));
+        }
+
+        if (badnave.get_vida() <= 0 && badNavecita.size() <= 0) {
+            if(nivel == 0) nivel = 1;
+            avanzarNivel(canvas);
         }
     }
 
+    public void gameOver(Canvas canvas) {
+        Log.e("Game over", "-");
+        Paint gover = new Paint();
+        gover.setColor(Color.RED);
+        gover.setTextSize(this.getHeight() / 4);
+        gover.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("Game Over!", this.getWidth() / 2, this.getHeight() / 2, gover);
 
+        Paint cont  = new Paint();
+
+        cont.setColor(Color.YELLOW);
+        cont.setStyle(Paint.Style.FILL);
+        canvas.drawRect(this.getWidth() / 8 * 3, this.getHeight() / 8 * 6, this.getWidth() / 8 * 5, this.getHeight() / 8 * 7, cont);
+
+        Paint msgCont = new Paint();
+        msgCont.setColor(Color.RED);
+        msgCont.setTextAlign(Paint.Align.CENTER);
+        msgCont.setTextSize(this.getHeight() / 32);
+        canvas.drawText("Continuar", this.getWidth() / 2, this.getHeight() /16 * 13, msgCont);
+
+        if( touched &&
+            x >= this.getWidth() / 8 * 3 && x <= this.getWidth() / 8 * 5 &&
+            y >= this.getHeight() / 8 * 6 && y <= this.getHeight() / 8 * 7) {
+
+            inicio.set_iniciado(false);
+        }
+    }
+
+    public void avanzarNivel(Canvas canvas) {
+        Paint cuadro = new Paint();
+        Paint msg_nivel = new Paint();
+
+        cuadro.setColor(Color.YELLOW);
+        canvas.drawRect((this.getWidth() / 8) * 3, (this.getHeight() / 8) * 3, (this.getWidth() / 8) * 5,(this.getHeight() / 8) * 5 , cuadro);
+
+        msg_nivel.setColor(Color.BLACK);
+        msg_nivel.setTextSize(this.getHeight() / 32);
+        msg_nivel.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("Completado", this.getWidth() / 2, this.getHeight() / 16 * 7, msg_nivel);
+        canvas.drawText("Toca aquí para continuar", this.getWidth() / 2, (this.getHeight() / 16) * 9, msg_nivel);
+
+
+        if (touched &&
+            x >= this.getWidth() / 8 * 3 && x <= this.getWidth() / 8 * 5 &&
+            y >= this.getHeight() / 8 * 3 && y <= this.getHeight() / 8 * 5) {
+
+            if (nivel == 2) {
+                this.nivel = 2;
+                this.fondoColor = Color.MAGENTA;
+                this.colorEstrella = Color.RED;
+                this.velocidad = 5;
+                this.badnave.setBitmap(bmp_badnave3);
+                this.danho = 1;
+
+                for (int i = 0; i < 15; i++) {
+                    badNavecita.add(new BadNavecita(this, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
+                }
+
+
+                for (int i = 0; i < badNavecita.size(); i++) {
+                    BadNavecita bnvct = badNavecita.get(i);
+                    bnvct.setBitmap(bmp_bad_navecita3);
+                }
+                badnave.set_vida(-100);
+
+            }
+
+            if (nivel == 1) {
+
+                this.nivel = 2;
+                this.fondoColor = Color.BLUE;
+                this.colorEstrella = Color.GREEN;
+                this.velocidad = 15;
+                this.badnave.setBitmap(bmp_badnave2);
+                this.danho = 5;
+
+                for (int i = 0; i < 10; i++) {
+                    badNavecita.add(new BadNavecita(this, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
+                    BadNavecita bnvct = badNavecita.get(i);
+                    bnvct.setBitmap(bmp_bad_navecita);
+                }
+
+                badnave.set_vida(-100);
+
+                nivel = 2;
+            }
+
+
+        }
+    }
 
     public void pausar() { // Se ejecuta para pausar
 

@@ -24,6 +24,10 @@ public class Inicio {
         return this.iniciado;
     }
 
+    public void set_iniciado(boolean b) {
+        this.iniciado = b;
+    }
+
     public void onDraw(Canvas canvas) {
 
         mensaje = new Paint();

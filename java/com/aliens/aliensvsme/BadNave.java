@@ -69,8 +69,6 @@ public class BadNave {
 
     public void indicadorVida(Canvas canvas) {
 
-        Log.e("vida ", diferencia + ", " + vida);
-
         Paint indicador = new Paint();
         indicador.setColor(Color.RED);
         indicador.setStyle(Paint.Style.FILL);
@@ -101,5 +99,7 @@ public class BadNave {
     public int get_posY() {
         return this.posY;
     }
+
+
 
 }
