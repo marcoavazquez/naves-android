@@ -18,9 +18,9 @@ public class BadNave {
     public int posX = 0;    //posicion de la nave en X
     public int posY = 0;        //posicion de la nave en Y
     private int speedX = 12;    // Velocidad inicial en la que se mueve la nave en X
-    private int speedY = 17;    // Velocidad inicial en la que se mueve la nave en Y
+    private int speedY = 13;    // Velocidad inicial en la que se mueve la nave en Y
 
-    public int vida = 100;      // Nivel de salud de la nave
+    public int vida = 50;      // Nivel de salud de la nave
     public int nivel;           // Cantidad de nivel de salud a diminuir por cada golpe de acuerdo al indicador
     public int nvl_indicador = nivel;
     public int diferencia;     // valor de vida, para el indicador en pixeles

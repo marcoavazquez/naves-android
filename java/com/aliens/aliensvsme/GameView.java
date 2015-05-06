@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -86,13 +88,20 @@ public class GameView extends SurfaceView {
 
     private List<TempSprite> temps = new ArrayList<TempSprite>();
 
-
+    SoundPool soundPool;
+    int fondom, disparo1, colision1, colision2, explosion1, explosion2;
     Random rnd; // Variable para obtener un numero aleatorio para que las naves y estrellas se muestren en lugares al azar
-
+    long lastClick;
+    boolean ultimo;
 
     // Se carga aqui todo lo necesario para el funcionamiento
     public GameView(Context context){
+
         super(context);
+
+
+
+
         gameLoopThread = new GameLoopThread(this);
         holder = getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -156,6 +165,14 @@ public class GameView extends SurfaceView {
 
         xplo = BitmapFactory.decodeResource(getResources(), R.drawable.xplo);
 
+        soundPool = new SoundPool(7, AudioManager.STREAM_MUSIC, 0);
+        fondom = soundPool.load(context, R.raw.fondom, 0);
+        disparo1 = soundPool.load(context, R.raw.disparo, 0);
+        colision1 = soundPool.load(context, R.raw.impact193, 0);
+        colision2 = soundPool.load(context, R.raw.impact197, 0);
+        explosion1 = soundPool.load(context, R.raw.explosion, 0);
+        explosion2 = soundPool.load(context, R.raw.shot, 0);
+
 
 
 
@@ -189,6 +206,9 @@ public class GameView extends SurfaceView {
             // se crean las naves pequeñas enemigas, 10 veces
             badNavecita.add(new BadNavecita(this, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
         }
+
+
+
     }
 
 
@@ -196,6 +216,14 @@ public class GameView extends SurfaceView {
     @Override
 
     protected void onDraw(Canvas canvas) {
+
+        if (System.currentTimeMillis() - lastClick > 6000) {
+            lastClick = System.currentTimeMillis();
+            synchronized (getHolder()) {
+                soundPool.play(fondom, 1, 1, 1, 0, 1);
+            }
+        }
+
         Log.e("Mi Vida", "(" + nave.get_vida());
         if (inicio.get_iniciado() && !escenario.getFueConstSeleccionada()) {
 
@@ -243,6 +271,12 @@ public class GameView extends SurfaceView {
 
             escenario.setFueConstSeleccionada(true); // metodo para hacer desaparecer la pantalla de seleccion
 
+            Paint score = new Paint();
+            score.setColor(Color.GRAY);
+            score.setTextSize(this.getHeight() / 20);
+            score.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("Puntos: " + nave.get_puntuacion(), this.getWidth() / 2, 50, score);
+
             // Dibuja el boton de pausa
             canvas.drawBitmap(pausa, this.getWidth() - (this.getWidth()/20), this.getHeight() - (this.getHeight() / 10), null);
 
@@ -257,7 +291,7 @@ public class GameView extends SurfaceView {
 
             escenario.setFueConstSeleccionada(false);
             escenario.setFueSeleccionada(false);
-            nave.setSalud(50);
+            nave.setSalud(100);
             nivel = 0;
             nave.puntuacion = 0;
             Log.e("Inicio", "-");
@@ -330,6 +364,7 @@ public class GameView extends SurfaceView {
             badnave.set_vida(danho); // Se le quita vida
             badnave.set_nvl_indicador(badnave.get_nivel());// Para que el indicador baje
             nave.set_puntuacion(15); // Sube tu puntaje
+            soundPool.play(colision1, 1, 1, 1, 0, 1);
         }
     }
 
@@ -343,19 +378,24 @@ public class GameView extends SurfaceView {
 
                 if (nave.meHanDado(bn.get_posX(), bn.get_posY())){  // si una navecita me ha golpeado
                     nave.set_vida(1);   // se me quita Salud o Vida
+                    synchronized (getHolder()) {
+                        soundPool.play(colision2, 1, 1, 1, 0, 1);
+                    }
+
                     dibujarGolpe(canvas, nave.posAncho + nave.bmpW, nave.posAlto + nave.bmpH, Color.YELLOW);
                 }
 
-                if ( bn.leHasDado(bala.get_x(), bala.get_posInicialY()) ){ // Si yo he golpeado a una
+                if (bn.leHasDado(bala.get_x(), bala.get_posInicialY()) ){ // Si yo he golpeado a una
 
                     dibujarGolpe(canvas, bala.get_x(), bala.get_posInicialY(),Color.RED); // Dibuja golpe
                     nave.set_puntuacion(10); // Aumenta puntuacion
 
                     bn.set_vida(danho);  // Quita Salud o Vida a nave
-
+                    soundPool.play(colision1, 1, 1, 1, 0, 1);
 
                     if (bn.get_vida() <= 0){     // Si su salud llega a Cero
                         nave.set_puntuacion(20); // Me dan 20 puntos
+
                         badNavecita.remove(bn); // y desaparece la nave
                         break;
                     }
@@ -470,9 +510,7 @@ public class GameView extends SurfaceView {
 
         }
 
-        for (int i = temps.size() - 1; i >= 0; i--) {
-            temps.get(i).onDraw(canvas);
-        }
+
 
         if (nave.get_vida() > 0) { // Dibuja minave si aun tengo VIDA o Salud
             nave.onDraw(canvas, bmp_nave);
@@ -483,15 +521,18 @@ public class GameView extends SurfaceView {
             badnave.onDraw(canvas);
             badnave.indicadorVida(canvas);
         }
+        for (int i = temps.size() - 1; i >= 0; i--) {
+            temps.get(i).onDraw(canvas);
+        }
 
         if ( nave.disparado() &&  nave.get_vida() > 0){  // Dibuja las balas si he disparado y si aun sigo vivo
 
             for (int i = 0; i < 3 ; i++) {
 
                 bala.onDraw(canvas, i, y); // Dibuja 3 balas
+
             }
             bala.set_levantado(false);
-
             accionesNavecitas(canvas); // Ejecuta las acciones de las navecitas
             golpearNaveMayor(canvas, bala.get_x(), bala.get_posInicialY()); //ejecuta esto por si he golpeado a la nave mayor
 
@@ -508,24 +549,70 @@ public class GameView extends SurfaceView {
         if (nave.meHanDado(badnave.get_posX(), badnave.get_posY())) { // si me tocan las naves enemigas
             nave.set_vida(2); // Si me han tocado me disminuye la vida en 2
             dibujarGolpe(canvas, nave.posAncho + nave.bmpW, nave.posAlto + nave.bmpH, Color.YELLOW);
+            soundPool.play(disparo1, 1, 1, 0, 0, 1);
         }
 
-        if (nave.get_vida() <= 0){
+        if (nave.get_vida() <= 0) {
+
             temps.add(new TempSprite(temps, this, nave.posAncho, nave.posAlto, xplo));
+
             gameOver(canvas);
+            if (System.currentTimeMillis() - lastClick > 4000) {
+                lastClick = System.currentTimeMillis();
+                synchronized (getHolder()) {
+                    soundPool.play(explosion1, 1, 1, 1, 0, 1);
+                }
+            }
+
         }
 
-        if (badnave.get_vida() == 0) {
+        if (badnave.get_vida() <= 0) {
+            if (System.currentTimeMillis() - lastClick > 4000) {
+                lastClick = System.currentTimeMillis();
+                synchronized (getHolder()) {
+                    soundPool.play(explosion1, 1, 1, 1, 0, 1);
+                }
+            }
             temps.add(new TempSprite(temps, this, badnave.get_posX(), badnave.get_posY(), xplo));
+
+
         }
 
         if (badnave.get_vida() <= 0 && badNavecita.size() <= 0) {
             if(nivel == 0) nivel = 1;
             avanzarNivel(canvas);
         }
+
+        if (ultimo && badnave.get_vida() <= 0 && badNavecita.size() <= 0) {
+            hasGanado(canvas);
+        }
+    }
+
+    public void hasGanado(Canvas canvas) {
+        Paint ganado = new Paint();
+        ganado.setColor(Color.GREEN);
+        ganado.setTextSize(this.getHeight() / 3);
+        ganado.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("Ganaste!!", this.getWidth() / 2, this.getHeight() / 4, ganado);
+
+        Paint pnts = new Paint();
+        pnts.setColor(Color.GREEN);
+        pnts.setTextSize(this.getHeight() / 5);
+        pnts.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("Tu puntaje: " + nave.get_puntuacion(), this.getWidth() / 2, (this.getHeight() / 4) * 3, pnts);
+
+
+        Paint cont  = new Paint();
+
+        cont.setColor(Color.YELLOW);
+        cont.setStyle(Paint.Style.FILL);
+        canvas.drawRect(this.getWidth() / 8 * 3, this.getHeight() / 8 * 6, this.getWidth() / 8 * 5, this.getHeight() / 8 * 7, cont);
+
     }
 
     public void gameOver(Canvas canvas) {
+
+        ultimo = false;
         Log.e("Game over", "-");
         Paint gover = new Paint();
         gover.setColor(Color.RED);
@@ -578,8 +665,8 @@ public class GameView extends SurfaceView {
                 this.velocidad = 5;
                 this.badnave.setBitmap(bmp_badnave3);
                 this.danho = 1;
-
-                for (int i = 0; i < 15; i++) {
+                ultimo = true;
+                for (int i = 0; i < 10; i++) {
                     badNavecita.add(new BadNavecita(this, rnd.nextInt(this.getWidth() / 2) + 200, rnd.nextInt(this.getHeight()) - 10));
                 }
 
